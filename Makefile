@@ -24,5 +24,11 @@ dist/system.bin: dist/boot.o dist/kernel.o
 dist/boot.o: src/boot.s
 	nasm -felf64 -o $@ $^
 
-dist/kernel.o: src/kernel.rs
-	rustc --target=x86_64-unknown-none --emit=obj -o $@ $^
+dist/kernel.o:
+	mkdir -p dist/kernel
+	cargo +nightly rustc --release \
+		-Z build-std=core \
+		--target x86_64-unknown-none \
+		-- --emit obj -o dist/kernel/kernel.o
+	mv dist/kernel/kernel*.o dist/kernel.o
+
