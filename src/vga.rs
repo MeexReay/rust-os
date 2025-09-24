@@ -23,16 +23,32 @@ pub unsafe fn putc(ch: u8, bg: u8, fg: u8, x: usize, y: usize) {
     VGA_MEMORY.add(x + y * VGA_WIDTH).write(ch as u16 | ((fg | bg << 4) as u16) << 8);
 }
 
-pub unsafe fn puts(st: &str, bg: u8, fg: u8, x: usize, y: usize) {
+pub unsafe fn puts(st: &[u8], bg: u8, fg: u8, x: usize, y: usize) {
     let mut nx = x;
     let mut ny = y;
     
-    for c in st.as_bytes() {
+    for c in st {
         putc(*c, bg, fg, nx, ny);
         nx += 1;
-        if (nx == VGA_WIDTH) {
+        if nx == VGA_WIDTH {
             nx = 0;
             ny += 1;
         }
     }
+}
+
+const HEX_DIGITS: &[u8; 16] = b"0123456789ABCDEF";
+
+pub unsafe fn puthex(byte: u8, bg: u8, fg: u8, x: usize, y: usize) {
+    let to_char = |x| {
+        match x {
+            0..=9 => b'0' + x,
+            10..=16 => b'A' + x - 10,
+            _ => b'?'
+        }
+    };
+    let high = (byte >> 4) & 0x0F;
+    let low = byte & 0x0F;
+
+    puts(&[0, to_char(high), 0, to_char(low)], bg, fg, x, y);
 }
