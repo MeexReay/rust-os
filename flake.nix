@@ -2,7 +2,7 @@
   description = "Rust OS flake";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
     flake-utils.url  = "github:numtide/flake-utils";
   };
@@ -14,20 +14,20 @@
         pkgs = import nixpkgs {
           inherit system overlays;
         };
+        rustToolchain = with pkgs;
+          rust-bin.selectLatestNightlyWith (toolchain: toolchain.default.override {
+            extensions = [ "rust-src" ];
+            targets = [ "x86_64-unknown-none" ];
+          });
         requires = with pkgs; [
           nasm
           grub2
           gnumake
+          rustToolchain
         ];
-      in
-      {
+      in {
         devShells.default = with pkgs; mkShell {
-          buildInputs = requires ++ [
-            (rust-bin.nightly.latest.default.override {
-              extensions = [ "rust-src" ];
-              targets = [ "x86_64-unknown-none" ];
-            })
-          ];
+          buildInputs = requires;
         };
       }
     );
