@@ -26,7 +26,7 @@ dist/boot.o: src/boot.s
 
 dist/kernel.o:
 	mkdir -p dist/kernel
-	cargo +nightly rustc --release \
+	cargo rustc --release \
 		-Z build-std=core \
 		--target x86_64-unknown-none \
 		-- --emit obj -o dist/kernel/kernel.o
