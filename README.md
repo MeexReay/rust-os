@@ -13,3 +13,5 @@ to build and run with qemu:
 ```
 make run
 ```
+
+requirements: gnumake, nasm, ld, nightly rust (cargo, rustc, rust-std)
